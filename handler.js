@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         New Userscript
+// @name         MentionScript
 // @namespace    http://tampermonkey.net/
-// @version      0.1
-// @description  try to take over the world!
-// @author       You
+// @version      0.9
+// @description  Mentions all user in group
+// @author       Shoter
 // @require      http://code.jquery.com/jquery-latest.js
 // @match        https://www.facebook.com/groups*
 // @grant        none
@@ -14,7 +14,7 @@
 	
 function log(msg)
 {
-	console.log(msg);
+	//console.log(msg);
 }
     
 function transformQueryStringIntoDictionary(/*string*/ queryString) {
