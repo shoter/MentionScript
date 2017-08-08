@@ -10,7 +10,12 @@
 // ==/UserScript==
 
 (function() {
-    'use strict';
+	'use strict';
+	
+function log(msg)
+{
+	console.log(msg);
+}
     
 function transformQueryStringIntoDictionary(/*string*/ queryString) {
 	var args = queryString.split("&");
@@ -56,6 +61,7 @@ var handler = {
 				var arg = myDecodeURI(argList[0]);
 				if (typeof self._url === "string" && self._url.contains("add/comment")) {
 					var params = (transformQueryStringIntoDictionary(arg));
+					log("Add comment " + params["comment_text"]);
 					if (getCommand(params["comment_text"]) !== null) {
 						parseComment(target, self, params);
 						return;
@@ -63,6 +69,7 @@ var handler = {
 				}
 				else if (typeof self._url === "string" && self._url.contains("updatestatus.php")) {
 					var params = (transformQueryStringIntoDictionary(arg));
+					log("Add status " + params["xhpc_message_text"]);
 					if (getCommand(params["xhpc_message_text"]) !== null) {
 						parseStatus(target, self, params);
 						return;
@@ -208,6 +215,7 @@ var commands =
 		"!mention_all!":
 		{
 			commentTransform: (command, target, xhr, queryDictionary, retFunc) => {
+				log(command + " - commentTransform");
 				getMembers(getGroupID(), (members) => {
 					var txt = createUrlMentions(members);
 					queryDictionary = modifyComment(command/*from higher scope :D*/, queryDictionary, txt);
@@ -217,6 +225,7 @@ var commands =
 			},
 			statusTransform: (command, target, xhr, queryDictionary, retFunc) => {
 				getMembers(getGroupID(), (members) => {
+					log(command + " - statusTransform");
 					var urlText = createUrlMentions(members);
 					var text = createTextMentions(members);
 					queryDictionary = modifyStatus(command/*from higher scope :D*/, queryDictionary, urlText, text);
@@ -228,11 +237,13 @@ var commands =
 		"!date!":
 		{
 			commentTransform: (command, target, xhr, queryDictionary, retFunc) => {
+				log(command + " - commentTransform");
 				queryDictionary = modifyComment(command/*from higher scope :D*/, queryDictionary, new Date().toJSON().slice(0, 10).replace(/-/g, '/'));
 				retFunc(target, xhr, queryDictionary);
 
 			},
 			statusTransform: (command, target, xhr, queryDictionary, retFunc) => {
+				log(command + " - statusTransform");
 				var date = new Date().toJSON().slice(0, 10).replace(/-/g, '/');
 				queryDictionary = modifyStatus(command/*from higher scope :D*/, queryDictionary, date, date);
 				retFunc(target, xhr, queryDictionary);
@@ -265,7 +276,8 @@ function print_call_stack() {
 
 XMLHttpRequest.prototype.send = new Proxy(XMLHttpRequest.prototype.send, handler);
 XMLHttpRequest.prototype.open = new Proxy(XMLHttpRequest.prototype.open, saveUrl);
-    
+	
+console.log("MentionScript loaded");
     
     
 })();
