@@ -198,7 +198,7 @@
 
 	function getMembers(/*groupID*/ groupID, /*(array memberIDs)*/ func) {
 		var xhr = new XMLHttpRequest();
-
+		log("getMember - " + groupID);
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
 
@@ -244,7 +244,7 @@
 	}
 
 	function getGroupID() {
-		var re = /facebook.com\/groups\/([0-9]+)/;
+		var re = /facebook.com\/groups\/(.+)\//;
 		var found = window.location.href.match(re);
 		return found[1];
 	}
@@ -280,6 +280,8 @@
 	XMLHttpRequest.prototype.open = new Proxy(XMLHttpRequest.prototype.open, saveUrl);
 
 	console.log("MentionScript loaded");
-
+	jQuery(document).on("click", ".UFICommentContainer", function() {
+	jQuery(this).css("background-color: yellow");
+	});
 
 })();
