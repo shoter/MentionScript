@@ -1,19 +1,20 @@
 // ==UserScript==
 // @name         MentionScript
 // @namespace    http://tampermonkey.net/
-// @version      0.9.1
+// @version      0.9
 // @description  Mentions all user in group
 // @author       Shoter
 // @require      http://code.jquery.com/jquery-latest.js
 // @match        https://www.facebook.com/groups*
-// @grant        none
+// @grant   GM_getValue
+// @grant   GM_setValue
 // ==/UserScript==
 
 (function () {
 	'use strict';
 
 	function log(msg) {
-		//console.log(msg);
+		console.log(msg);
 	}
 
 	function getQueryStringFromDictionary(dictionary) {
@@ -24,7 +25,7 @@
 				query += "&";
 			}
 			query += key;
-			if (dictionary[key] != "") {
+			if (dictionary[key] !== "") {
 				query += "=" + dictionary[key];
 			}
 			first = false;
@@ -69,13 +70,13 @@
 
 	var handler = {
 		apply: (target, self, argList) => {
-			if (argList.length == 1) {
-				if (typeof argList[0] === 'string') {
+			if (argList.length === 1) {
+				if ((typeof argList[0]) === 'string') {
 					var arg = myDecodeURI(argList[0]);
 					if (typeof self._url === "string" && self._url.contains("add/comment")) {
 						var params = (transformQueryStringIntoDictionary(arg));
 						log("Add comment " + params["comment_text"]);
-						if (getCommand(params["comment_text"]) !== null) {
+						if (getCommand(params["comment_text"])) {
 							parseComment(target, self, params);
 							return;
 						}
@@ -83,7 +84,7 @@
 					else if (typeof self._url === "string" && self._url.contains("updatestatus.php")) {
 						var params = (transformQueryStringIntoDictionary(arg));
 						log("Add status " + params["xhpc_message_text"]);
-						if (getCommand(params["xhpc_message_text"]) !== null) {
+						if (getCommand(params["xhpc_message_text"])) {
 							parseStatus(target, self, params);
 							return;
 						}
@@ -96,6 +97,7 @@
 
 	function parseComment(target, xhr, params) {
 		var command = getCommand(params["comment_text"]);
+        log("command = " + command);
 		if (command !== null) {
 			commands[command].commentTransform(command, target, xhr, params, parseComment);
 		}
@@ -253,7 +255,7 @@
 
 	function getCommand(text) {
 		for (var command in commands) {
-			if (text.contains(command))
+			if (text.indexOf(command) >= 0)
 				return command;
 		}
 		return null;
