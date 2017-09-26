@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MentionScript
 // @namespace    http://tampermonkey.net/
-// @version      0.9
+// @version      0.10.0
 // @description  Mentions all user in group
 // @author       Shoter
 // @require      http://code.jquery.com/jquery-latest.js
