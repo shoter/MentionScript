@@ -5,6 +5,7 @@
 // @description  Mentions all user in group
 // @author       Shoter
 // @require      http://code.jquery.com/jquery-latest.js
+// @require      https://rawgit.com/notifyjs/notifyjs/master/dist/notify.js
 // @match        https://www.facebook.com/groups*
 // @grant   GM_getValue
 // @grant   GM_setValue
@@ -12,10 +13,23 @@
 
 (function () {
 	'use strict';
+    var wylaczWkurwiajacePopupy = false;
 
 	function log(msg) {
 		console.log(msg);
 	}
+
+    function info(msg)
+    {
+        if(wylaczWkurwiajacePopupy === false)
+            $.notify(msg, "info");
+    }
+
+    function success(msg)
+    {
+        if(wylaczWkurwiajacePopupy === false)
+            $.notify(msg, "success");
+    }
 
 	function getQueryStringFromDictionary(dictionary) {
 		var query = "";
@@ -102,6 +116,7 @@
 			commands[command].commentTransform(command, target, xhr, params, parseComment);
 		}
 		else {
+            success("comment parsed!");
 			return target.apply(xhr, [myEncodeURI(getQueryStringFromDictionary(params))]);
 		}
 	}
@@ -112,6 +127,7 @@
 			commands[command].statusTransform(command, target, xhr, params, parseStatus);
 		}
 		else {
+            success("status parsed!");
 			return target.apply(xhr, [myEncodeURI(getQueryStringFromDictionary(params))]);
 		}
 	}
@@ -121,7 +137,7 @@
 			"!mention_all!":
 			{
 				commentTransform: (command, target, xhr, queryDictionary, retFunc) => {
-					log(command + " - commentTransform");
+					info(command + " - commentTransform");
 					getMembers(getGroupID(), (members) => {
 						var txt = createUrlMentions(members);
 						queryDictionary = modifyComment(command, queryDictionary, txt);
@@ -131,7 +147,7 @@
 				},
 				statusTransform: (command, target, xhr, queryDictionary, retFunc) => {
 					getMembers(getGroupID(), (members) => {
-						log(command + " - statusTransform");
+						info(command + " - statusTransform");
 						var urlText = createUrlMentions(members);
 						var text = createTextMentions(members);
 						queryDictionary = modifyStatus(command, queryDictionary, urlText, text);
@@ -143,13 +159,13 @@
 			"!date!":
 			{
 				commentTransform: (command, target, xhr, queryDictionary, retFunc) => {
-					log(command + " - commentTransform");
+					info(command + " - commentTransform");
 					queryDictionary = modifyComment(command, queryDictionary, new Date().toJSON().slice(0, 10).replace(/-/g, '/'));
 					retFunc(target, xhr, queryDictionary);
 
 				},
 				statusTransform: (command, target, xhr, queryDictionary, retFunc) => {
-					log(command + " - statusTransform");
+					info(command + " - statusTransform");
 					var date = new Date().toJSON().slice(0, 10).replace(/-/g, '/');
 					queryDictionary = modifyStatus(command, queryDictionary, date, date);
 					retFunc(target, xhr, queryDictionary);
@@ -279,7 +295,7 @@
 	XMLHttpRequest.prototype.send = new Proxy(XMLHttpRequest.prototype.send, handler);
 	XMLHttpRequest.prototype.open = new Proxy(XMLHttpRequest.prototype.open, saveUrl);
 
-	console.log("MentionScript loaded");
+	success("MentionScript loaded");
 	jQuery(document).on("click", ".UFICommentContainer", function() {
 	jQuery(this).css("background-color: yellow");
 	});
